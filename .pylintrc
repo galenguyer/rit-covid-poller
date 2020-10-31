@@ -1,0 +1,6 @@
+[MASTER]
+persistent = yes
+load-plugins = pylint_quotes
+
+[FORMAT]
+output-format = colorized
