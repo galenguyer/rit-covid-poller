@@ -104,6 +104,44 @@ def get_latest_from_db():
         }
         return data
 
+def get_all_from_db():
+    with db_lock:
+        db_conn = sqlite3.connect('data/data.sqlite3')
+        c = db_conn.cursor()
+        sql = 'SELECT alertlevel.time, alertlevel.color, total.total_students, total.total_staff, new.new_students, new.new_staff, ' + \
+            'quarantine.quarantine_on_campus, quarantine.quarantine_off_campus, isolation.isolation_on_campus, isolation.isolation_off_campus, ' + \
+            'beds.beds_available, tests.tests_administered ' + \
+            'FROM `alertlevel` ' + \
+            'INNER JOIN `total` ' + \
+            'ON alertlevel.time = total.time ' + \
+            'INNER JOIN `new` ' + \
+            'ON alertlevel.time = new.time ' + \
+            'INNER JOIN `quarantine` ' + \
+            'ON alertlevel.time = quarantine.time ' + \
+            'INNER JOIN `isolation` ' + \
+            'ON alertlevel.time = isolation.time ' + \
+            'INNER JOIN `beds` ' + \
+            'ON alertlevel.time = beds.time ' + \
+            'INNER JOIN `tests` ' + \
+            'ON alertlevel.time = tests.time'
+        c.execute(sql)
+
+        data = [{
+            'alert_level': d[1],        
+            'total_students': d[2],
+            'total_staff': d[3],
+            'new_students': d[4],
+            'new_staff': d[5],
+            'quarantine_on_campus': d[6],
+            'quarantine_off_campus': d[7],
+            'isolation_on_campus': d[8],
+            'isolation_off_campus': d[9],
+            'beds_available': d[10],
+            'tests_administered': d[11],
+            'last_updated': d[0]
+        } for d in c.fetchall()]
+        return data
+
 def data_is_same(current_data):
     global LATEST_DATA
     if LATEST_DATA is None or current_data is None:
@@ -193,4 +231,9 @@ def _api_v0_latest():
 @APP.route('/api/v0/latestdb')
 def _api_v0_latestdb():
     data = get_latest_from_db()
+    return jsonify(data)
+
+@APP.route('/api/v0/history')
+def _api_v0_history():
+    data = get_all_from_db()
     return jsonify(data)
