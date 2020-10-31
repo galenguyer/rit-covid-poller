@@ -65,12 +65,60 @@ def update_db():
         db_conn.commit()
         db_conn.close()
 
+def get_latest_from_db():
+    with db_lock:
+        db_conn = sqlite3.connect('data/data.sqlite3')
+        c = db_conn.cursor()
+        sql = 'SELECT max(alertlevel.time), alertlevel.color, total.total_students, total.total_staff, new.new_students, new.new_staff, ' + \
+            'quarantine.quarantine_on_campus, quarantine.quarantine_off_campus, isolation.isolation_on_campus, isolation.isolation_off_campus, ' + \
+            'beds.beds_available, tests.tests_administered ' + \
+            'FROM `alertlevel` ' + \
+            'INNER JOIN `total` ' + \
+            'ON alertlevel.time = total.time ' + \
+            'INNER JOIN `new` ' + \
+            'ON alertlevel.time = new.time ' + \
+            'INNER JOIN `quarantine` ' + \
+            'ON alertlevel.time = quarantine.time ' + \
+            'INNER JOIN `isolation` ' + \
+            'ON alertlevel.time = isolation.time ' + \
+            'INNER JOIN `beds` ' + \
+            'ON alertlevel.time = beds.time ' + \
+            'INNER JOIN `tests` ' + \
+            'ON alertlevel.time = tests.time'
+        c.execute(sql)
+        d = c.fetchone()
+
+        data = {
+            'alert_level': d[1],        
+            'total_students': d[2],
+            'total_staff': d[3],
+            'new_students': d[4],
+            'new_staff': d[5],
+            'quarantine_on_campus': d[6],
+            'quarantine_off_campus': d[7],
+            'isolation_on_campus': d[8],
+            'isolation_off_campus': d[9],
+            'beds_available': d[10],
+            'tests_administered': d[11],
+            'last_updated': d[0]
+        }
+        return data
+
 def data_is_same(current_data):
     global LATEST_DATA
     if LATEST_DATA is None or current_data is None:
         return False
     for key in list(LATEST_DATA.keys()):
-        if current_data[key] != LATEST_DATA[key] and key != 'last_updated':
+        if key != 'last_updated' and current_data[key] != LATEST_DATA[key]:
+            return False
+    return True
+
+def db_is_same(current_data):
+    latest_data = get_latest_from_db()
+    if latest_data is None or current_data is None:
+        return False
+    for key in list(latest_data.keys()):
+        if key != 'last_updated' and current_data[key] != latest_data[key]:
             return False
     return True
 
@@ -117,8 +165,8 @@ def get_data():
         'tests_administered': tests_administered,
         'last_updated': datetime.datetime.now()
     }
-    if not data_is_same(current_data):
-        LATEST_DATA = current_data
+    LATEST_DATA = current_data
+    if not db_is_same(current_data):
         update_db()
     return current_data
 
@@ -138,6 +186,11 @@ else:
 
 APP.secret_key = APP.config['SECRET_KEY']
 
-@APP.route('/api/v1/latest')
-def _index():
+@APP.route('/api/v0/latest')
+def _api_v0_latest():
     return jsonify(LATEST_DATA)
+
+@APP.route('/api/v0/latestdb')
+def _api_v0_latestdb():
+    data = get_latest_from_db()
+    return jsonify(data)
