@@ -44,6 +44,27 @@ def create_tables():
         db_conn.commit()
         db_conn.close()
 
+def update_db():
+    with db_lock:
+        db_conn = sqlite3.connect('data/data.sqlite3')
+        c = db_conn.cursor()
+        sql = f'INSERT INTO `alertlevel` VALUES (datetime(\'now\'), \'{LATEST_DATA["alert_level"]}\');'
+        c.execute(sql)
+        sql = f'INSERT INTO `total` VALUES (datetime(\'now\'), {LATEST_DATA["total_students"]}, {LATEST_DATA["total_staff"]});'
+        c.execute(sql)
+        sql = f'INSERT INTO `new` VALUES (datetime(\'now\'), {LATEST_DATA["new_students"]}, {LATEST_DATA["new_staff"]});'
+        c.execute(sql)
+        sql = f'INSERT INTO `quarantine` VALUES (datetime(\'now\'), {LATEST_DATA["quarantine_on_campus"]}, {LATEST_DATA["quarantine_off_campus"]});'
+        c.execute(sql)
+        sql = f'INSERT INTO `isolation` VALUES (datetime(\'now\'), {LATEST_DATA["isolation_on_campus"]}, {LATEST_DATA["isolation_off_campus"]});'
+        c.execute(sql)
+        sql = f'INSERT INTO `beds` VALUES (datetime(\'now\'), {LATEST_DATA["beds_available"]});'
+        c.execute(sql)
+        sql = f'INSERT INTO `tests` VALUES (datetime(\'now\'), {LATEST_DATA["tests_administered"]});'
+        c.execute(sql)
+        db_conn.commit()
+        db_conn.close()
+
 def data_is_same(current_data):
     global LATEST_DATA
     if LATEST_DATA is None or current_data is None:
@@ -98,6 +119,8 @@ def get_data():
     }
     if not data_is_same(current_data):
         LATEST_DATA = current_data
+        update_db()
+    return current_data
 
 
 get_data()
