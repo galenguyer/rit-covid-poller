@@ -18,10 +18,10 @@ Locally running this application should be pretty simple.
 2. Install dependencies
   * `pip install -r requirements.txt`
 3. Run the app
-  * `gunicorn demo:APP --bind=localhost:5000`
+  * `gunicorn poller:APP --bind=localhost:5000`
 4. Visit localhost:5000 in your web browser.
 
 ## Linting
 This demo uses pylint.
-Travis CI will automatically run pylint on commits and PRs, but you can also run pylint manually, using `pylint demo`.
+Travis CI will automatically run pylint on commits and PRs, but you can also run pylint manually, using `pylint poller`.
 The pylint_quotes plugin is loaded by [the pylintrc](./.pylintrc) and will ensure standardised quotation mark formats.
