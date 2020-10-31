@@ -20,7 +20,6 @@ if not os.path.exists('./data'):
     os.mkdir('./data')
 
 def interrupt():
-    global ping_thread
     global data_thread
     data_thread.cancel()
 
