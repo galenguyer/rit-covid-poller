@@ -130,3 +130,6 @@ dmypy.json
 
 # Don't commit secrets!
 config.py
+
+# don't commit data
+data/
