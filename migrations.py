@@ -95,7 +95,7 @@ def db_is_same():
 
 if not os.path.exists('./poller'):
     os.mkdir('./poller')
-if not os.path.exists('./poller/data')
+if not os.path.exists('./poller/data'):
     os.mkdir('./poller/data')
 
 create_tables()
