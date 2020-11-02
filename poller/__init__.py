@@ -201,7 +201,7 @@ def get_data():
         'isolation_off_campus': isolation_off_campus,
         'beds_available': beds_available,
         'tests_administered': tests_administered,
-        'last_updated': str(datetime.datetime.now()).replace('GMT', 'EST')
+        'last_updated': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     LATEST_DATA = current_data
     if not db_is_same(current_data):
