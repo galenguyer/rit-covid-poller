@@ -10,7 +10,7 @@ from flask import Flask, jsonify
 import requests
 from bs4 import BeautifulSoup
 
-POOL_TIME = 5 * 60 # Seconds
+POOL_TIME = 1 * 60 # Seconds
 DASHBOARD_URL = 'https://rit.edu/ready/dashboard'
 LATEST_DATA = None
 data_thread = threading.Thread()
