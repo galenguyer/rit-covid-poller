@@ -6,7 +6,7 @@ LATEST_DATA={}
 
 def create_tables():
     print('creating tables')
-    db_conn = sqlite3.connect('./poller/data/data.sqlite3')
+    db_conn = sqlite3.connect('./data/data.sqlite3')
     c = db_conn.cursor()
     sql = f'CREATE TABLE IF NOT EXISTS `alertlevel` (time DATETIME PRIMARY KEY NOT NULL, color CHAR(50) NOT NULL);'
     c.execute(sql)
@@ -26,7 +26,7 @@ def create_tables():
     db_conn.close()
 
 def update_db():
-    db_conn = sqlite3.connect('./poller/data/data.sqlite3')
+    db_conn = sqlite3.connect('./data/data.sqlite3')
     c = db_conn.cursor()
     sql = f'INSERT INTO `alertlevel` VALUES (\'{LATEST_DATA["last_updated"]}\', \'{LATEST_DATA["alert_level"]}\');'
     c.execute(sql)
@@ -47,7 +47,7 @@ def update_db():
 
 def get_latest_from_db():
 
-    db_conn = sqlite3.connect('./poller/data/data.sqlite3')
+    db_conn = sqlite3.connect('./data/data.sqlite3')
     c = db_conn.cursor()
     sql = 'SELECT max(alertlevel.time), alertlevel.color, total.total_students, total.total_staff, new.new_students, new.new_staff, ' + \
         'quarantine.quarantine_on_campus, quarantine.quarantine_off_campus, isolation.isolation_on_campus, isolation.isolation_off_campus, ' + \
@@ -93,10 +93,8 @@ def db_is_same():
             return False
     return True
 
-if not os.path.exists('./poller'):
-    os.mkdir('./poller')
-if not os.path.exists('./poller/data'):
-    os.mkdir('./poller/data')
+if not os.path.exists('./data'):
+    os.mkdir('./data')
 
 create_tables()
 
