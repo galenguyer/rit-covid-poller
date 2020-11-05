@@ -59,12 +59,15 @@ def drop_by_date(date):
     db_conn.close()
 
 
-data = get_all_from_db()
-# get first date
-starting_date = data[-1]['last_updated'].split(' ')[0]
-for i in range(len(data)-2, 0, -1):
-    if data[i]['last_updated'].split(' ')[0] != starting_date:
-        starting_date = data[i]['last_updated'].split(' ')[0]
-    else:
-        drop_by_date(data[i]['last_updated'])
-        print('dropped ' + data[i]['last_updated'])
+def dedup():
+    data = get_all_from_db()
+    # get first date
+    starting_date = data[-1]['last_updated'].split(' ')[0]
+    for i in range(len(data)-2, 0, -1):
+        if data[i]['last_updated'].split(' ')[0] != starting_date:
+            starting_date = data[i]['last_updated'].split(' ')[0]
+        else:
+            drop_by_date(data[i]['last_updated'])
+            print('dropped ' + data[i]['last_updated'])
+
+dedup()

@@ -10,6 +10,8 @@ from flask import Flask, jsonify
 import requests
 from bs4 import BeautifulSoup
 
+import dedup from .dedup
+
 POOL_TIME = 5 * 60 # Seconds
 DASHBOARD_URL = 'https://rit.edu/ready/dashboard'
 LATEST_DATA = None
@@ -64,6 +66,7 @@ def update_db():
         c.execute(sql)
         db_conn.commit()
         db_conn.close()
+        dedup()
 
 def get_latest_from_db():
     with db_lock:
