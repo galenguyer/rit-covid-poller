@@ -10,7 +10,7 @@ from flask import Flask, jsonify
 import requests
 from bs4 import BeautifulSoup
 
-import dedup from .dedup
+from .dedup import dedup
 
 POOL_TIME = 5 * 60 # Seconds
 DASHBOARD_URL = 'https://rit.edu/ready/dashboard'
