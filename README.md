@@ -1,12 +1,8 @@
-# Flask wsgi bootstrap/demo
+# RIT COVID Poller
 
-This demo shows the use of gunicorn with flask. Original credit goes to [Max Meinhold](https://github.com/mxmeinhold/flask-gunicorn-demo).
-It includes a basic Dockerfile, a linting demonstration using Pylint, and a Travis CI configuration for running linting.
-
-This is not an in depth guide in how these tools work, but a basic starting point and reference.
-
-Make sure to change my name and email if you use this template, especially in the license.
-
+## Endpoints
+- `/api/v0/latest` - retrieve the current state of the dashboard in JSON format
+- `/api/v0/history` - retrieve all the prior states of the dashboard
 
 ## Setup
 Locally running this application should be pretty simple.
