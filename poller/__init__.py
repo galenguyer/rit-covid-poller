@@ -240,3 +240,23 @@ def _api_v0_latestdb():
 def _api_v0_history():
     data = get_all_from_db()
     return jsonify(data)
+
+@APP.route('/api/v0/difference')
+def _api_v0_difference():
+    data = get_all_from_db()
+    latest = data[-1]
+    prev = data[-2]
+    data = {
+        'alert_level': f'{prev["alert_level"]} -> {latest["alert_level"]}',        
+        'total_students': latest["total_students"] - prev["total_students"],
+        'total_staff': latest["total_staff"] - prev["total_staff"],
+        'new_students': latest["new_students"] - prev["new_students"],
+        'new_staff': latest["new_staff"] - prev["new_staff"],
+        'quarantine_on_campus': latest["quarantine_on_campus"] - prev["quarantine_on_campus"],
+        'quarantine_off_campus': latest["quarantine_off_campus"] - prev["quarantine_off_campus"],
+        'isolation_on_campus': latest["isolation_on_campus"] - prev["isolation_on_campus"],
+        'isolation_off_campus': latest["isolation_off_campus"] - prev["isolation_off_campus"],
+        'beds_available': latest["beds_available"] - prev["beds_available"],
+        'tests_administered': latest["tests_administered"] - prev["tests_administered"],
+    }
+    return jsonify(data)
