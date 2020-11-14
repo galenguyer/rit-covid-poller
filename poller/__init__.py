@@ -263,27 +263,23 @@ def _api_v0_difference():
 
 @APP.route('/api/v0/diff')
 def _api_v0_diff():
-    query = request.args.get('q')
-    if query is None:
-        return make_repsonse(jsonify({'error': 'you must specify either a number or a range'}), 400)
-    first = -1
-    last = -1
-    if ',' not in query:
-        try:
-            first = int(query)
-        except: 
-            return make_repsonse(jsonify({'error': 'you must specify either a number or a range'}), 400)
+    first = request.args.get('first')
+    last = request.args.get('last')
+    data = get_all_from_db()
+    if first is None:
+        first = 0
     else:
         try:
-            first = int(query.partition(',')[0])
-            last = int(query.partition(',')[2])
+            first = int(first)
         except:
-            return make_repsonse(jsonify({'error': 'you must specify either a number or a range'}), 400)
-    data = get_all_from_db()
-    if first < 0 or (last is not -1 and last < first):
-        return make_response(jsonify({'error': 'both numbers must be > 0 and last > first'}), 400)
-    if last >= len(data):
-        return make_response(jsonify({'error': f'last must be less than or equal to {len(data) - 1}'}), 400)
+            first = 0
+    if last is None:
+        last = len(data) - 1
+    else:
+        try:
+            last = int(last)
+        except:
+            last = len(data) - 1
     latest = data[last]
     prev = data[first]
     data = {
@@ -298,6 +294,7 @@ def _api_v0_diff():
         'isolation_off_campus': latest["isolation_off_campus"] - prev["isolation_off_campus"],
         'beds_available': latest["beds_available"] - prev["beds_available"],
         'tests_administered': latest["tests_administered"] - prev["tests_administered"],
+        'description': f'day {first} to {last}'
     }
     return jsonify(data)
 
