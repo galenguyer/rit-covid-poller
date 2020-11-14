@@ -6,7 +6,7 @@ import sqlite3
 import atexit
 import datetime
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, make_response
 import requests
 from bs4 import BeautifulSoup
 
@@ -260,3 +260,44 @@ def _api_v0_difference():
         'tests_administered': latest["tests_administered"] - prev["tests_administered"],
     }
     return jsonify(data)
+
+@APP.route('/api/v0/diff')
+def _api_v0_diff():
+    query = request.args.get('q')
+    if query is None:
+        return make_repsonse(jsonify({'error': 'you must specify either a number or a range'}), 400)
+    first = -1
+    last = -1
+    if ',' not in query:
+        try:
+            first = int(query)
+        except: 
+            return make_repsonse(jsonify({'error': 'you must specify either a number or a range'}), 400)
+    else:
+        try:
+            first = int(query.partition(',')[0])
+            last = int(query.partition(',')[2])
+        except:
+            return make_repsonse(jsonify({'error': 'you must specify either a number or a range'}), 400)
+    data = get_all_from_db()
+    if first < 0 or (last is not -1 and last < first):
+        return make_response(jsonify({'error': 'both numbers must be > 0 and last > first'}), 400)
+    if last >= len(data):
+        return make_response(jsonify({'error': f'last must be less than or equal to {len(data) - 1}'}), 400)
+    latest = data[last]
+    prev = data[first]
+    data = {
+        'alert_level': f'{prev["alert_level"]} -> {latest["alert_level"]}',        
+        'total_students': latest["total_students"] - prev["total_students"],
+        'total_staff': latest["total_staff"] - prev["total_staff"],
+        'new_students': latest["new_students"] - prev["new_students"],
+        'new_staff': latest["new_staff"] - prev["new_staff"],
+        'quarantine_on_campus': latest["quarantine_on_campus"] - prev["quarantine_on_campus"],
+        'quarantine_off_campus': latest["quarantine_off_campus"] - prev["quarantine_off_campus"],
+        'isolation_on_campus': latest["isolation_on_campus"] - prev["isolation_on_campus"],
+        'isolation_off_campus': latest["isolation_off_campus"] - prev["isolation_off_campus"],
+        'beds_available': latest["beds_available"] - prev["beds_available"],
+        'tests_administered': latest["tests_administered"] - prev["tests_administered"],
+    }
+    return jsonify(data)
+
