@@ -31,6 +31,22 @@ paths:
           schema:
             type: "object"
             $ref: "#/definitions/Day"
+  /v0/history:
+    get:
+      tags:
+      - "v0"
+      summary: "Gets all historical data"
+      description: "Returns data from every day where the dashboard changed"
+      operationId: "getv0History"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Day"
 definitions:
   Day:
     type: "object"
