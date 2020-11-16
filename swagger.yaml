@@ -1,0 +1,82 @@
+swagger: "2.0"
+info:
+  description: "This is a simple API to retrieve current and historical data from the RIT COVID Dashboard."
+  version: "1.0.0"
+  title: "RIT COVID Poller"
+  contact:
+    email: "galen@galenguyer.com"
+  license:
+    name: "AGPL 3.0"
+    url: "https://www.gnu.org/licenses/agpl-3.0.txt"
+host: "ritcoviddashboard.com"
+basePath: "/api"
+tags:
+- name: "v0"
+  description: "The latest version of the API, subject to breaking changes"
+schemes:
+- "https"
+paths:
+  /v0/latest:
+    get:
+      tags:
+      - "v0"
+      summary: "Gets the latest data"
+      description: "Returns the most recent data from the official dashboard"
+      operationId: "getv0Latest"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "object"
+            $ref: "#/definitions/Day"
+definitions:
+  Day:
+    type: "object"
+    properties:
+      alert_level:
+        type: "string"
+        enum:
+        - "green"
+        - "yellow"
+        - "orange"
+        - "red"
+      beds_available:
+        type: "integer"
+        format: "int32"
+      isolation_off_campus:
+        type: "integer"
+        format: "int32"
+      isolation_on_campus:
+        type: "integer"
+        format: "int32"
+      last_updated:
+        type: "string"
+        format: "date-time"
+      new_staff:
+        type: "integer"
+        format: "int32"
+      new_students:
+        type: "integer"
+        format: "int32"
+      quarantine_off_campus:
+        type: "integer"
+        format: "int32"
+      quarantine_on_campus:
+        type: "integer"
+        format: "int32"
+      test_administered:
+        type: "integer"
+        format: "int32"
+      total_staff:
+        type: "integer"
+        format: "int32"
+      total_students:
+        type: "integer"
+        format: "int32"
+    xml:
+      name: "Day"
+externalDocs:
+  description: "Read the source on GitHub"
+  url: "https://github.com/galenguyer/rit-covid-poller"
