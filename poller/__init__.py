@@ -179,7 +179,7 @@ def get_data():
     isolation_on_campus = int(soup.find('div', attrs={'class': 'statistic-12226'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
     isolation_off_campus = int(soup.find('div', attrs={'class': 'statistic-12229'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
     beds_available = int(soup.find('div', attrs={'class': 'statistic-12214'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip().strip('%'))
-    tests_administered = int(soup.find('div', attrs={'class': 'statistic-12829'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip().replace("*", " "))
+    tests_administered = int(soup.find('div', attrs={'class': 'statistic-12829'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip().replace("*", " ").replace(",", ""))
     container = soup.find('div', attrs={'id': 'pandemic-message-container'})
     alert_level = container.find("a").text
     color = ""
