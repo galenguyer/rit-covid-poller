@@ -15,6 +15,7 @@ Locally running this application should be pretty simple.
   * `pip install -r requirements.txt`
 3. Run the app
   * `gunicorn poller:APP --bind=localhost:5000`
+3.5. Scream because the database won't work because that's hard and I wrote this really poorly (rewrite soon(tm))
 4. Visit localhost:5000 in your web browser.
 
 ## Linting
