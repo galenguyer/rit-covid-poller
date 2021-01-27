@@ -1,0 +1,14 @@
+{
+    "alert_level": "yellow",
+    "beds_available": 90,
+    "isolation_off_campus": 28,
+    "isolation_on_campus": 5,
+    "last_updated": "2021-01-25 16:29:06",
+    "new_staff": 56,
+    "new_students": 22,
+    "quarantine_off_campus": 47,
+    "quarantine_on_campus": 10,
+    "tests_administered": 13782,
+    "total_staff": 147,
+    "total_students": 158
+}
