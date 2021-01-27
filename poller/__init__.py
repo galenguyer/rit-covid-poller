@@ -55,8 +55,8 @@ def update_db():
         c.execute(sql)
         sql = f'INSERT INTO `total` VALUES (datetime(\'now\'), {LATEST_DATA["total_students"]}, {LATEST_DATA["total_staff"]});'
         c.execute(sql)
-        #sql = f'INSERT INTO `new` VALUES (datetime(\'now\'), {LATEST_DATA["new_students"]}, {LATEST_DATA["new_staff"]});'
-        #c.execute(sql)
+        sql = f'INSERT INTO `new` VALUES (datetime(\'now\'), {LATEST_DATA["new_students"]}, {LATEST_DATA["new_staff"]});'
+        c.execute(sql)
         sql = f'INSERT INTO `quarantine` VALUES (datetime(\'now\'), {LATEST_DATA["quarantine_on_campus"]}, {LATEST_DATA["quarantine_off_campus"]});'
         c.execute(sql)
         sql = f'INSERT INTO `isolation` VALUES (datetime(\'now\'), {LATEST_DATA["isolation_on_campus"]}, {LATEST_DATA["isolation_off_campus"]});'
@@ -70,50 +70,20 @@ def update_db():
         dedup()
 
 def get_latest_from_db():
-    with db_lock:
-        db_conn = sqlite3.connect('data/data.sqlite3')
-        c = db_conn.cursor()
-        sql = 'SELECT max(alertlevel.time), alertlevel.color, total.total_students, total.total_staff, ' + \
-            'quarantine.quarantine_on_campus, quarantine.quarantine_off_campus, isolation.isolation_on_campus, isolation.isolation_off_campus, ' + \
-            'beds.beds_available, tests.tests_administered ' + \
-            'FROM `alertlevel` ' + \
-            'INNER JOIN `total` ' + \
-            'ON alertlevel.time = total.time ' + \
-            'INNER JOIN `quarantine` ' + \
-            'ON alertlevel.time = quarantine.time ' + \
-            'INNER JOIN `isolation` ' + \
-            'ON alertlevel.time = isolation.time ' + \
-            'INNER JOIN `beds` ' + \
-            'ON alertlevel.time = beds.time ' + \
-            'INNER JOIN `tests` ' + \
-            'ON alertlevel.time = tests.time'
-        c.execute(sql)
-        d = c.fetchone()
-
-        data = {
-            'alert_level': d[1],        
-            'total_students': d[2],
-            'total_staff': d[3],
-            'quarantine_on_campus': d[4],
-            'quarantine_off_campus': d[5],
-            'isolation_on_campus': d[6],
-            'isolation_off_campus': d[7],
-            'beds_available': d[8],
-            'tests_administered': d[9],
-            'last_updated': d[0]
-        }
-        return data
+    return get_all_from_db()[-1]
 
 def get_all_from_db():
     with db_lock:
         db_conn = sqlite3.connect('data/data.sqlite3')
         c = db_conn.cursor()
-        sql = 'SELECT alertlevel.time, alertlevel.color, total.total_students, total.total_staff, ' + \
+        sql = 'SELECT alertlevel.time, alertlevel.color, total.total_students, total.total_staff, new.new_students, new.new_staff, ' + \
             'quarantine.quarantine_on_campus, quarantine.quarantine_off_campus, isolation.isolation_on_campus, isolation.isolation_off_campus, ' + \
             'beds.beds_available, tests.tests_administered ' + \
             'FROM `alertlevel` ' + \
             'INNER JOIN `total` ' + \
             'ON alertlevel.time = total.time ' + \
+            'INNER JOIN `new` ' + \
+            'ON alertlevel.time = new.time ' + \
             'INNER JOIN `quarantine` ' + \
             'ON alertlevel.time = quarantine.time ' + \
             'INNER JOIN `isolation` ' + \
@@ -128,14 +98,14 @@ def get_all_from_db():
             'alert_level': d[1],        
             'total_students': d[2],
             'total_staff': d[3],
-            #'new_students': d[4],
-            #'new_staff': d[5],
-            'quarantine_on_campus': d[4],
-            'quarantine_off_campus': d[5],
-            'isolation_on_campus': d[6],
-            'isolation_off_campus': d[7],
-            'beds_available': d[8],
-            'tests_administered': d[9],
+            'new_students': d[4],
+            'new_staff': d[5],
+            'quarantine_on_campus': d[6],
+            'quarantine_off_campus': d[7],
+            'isolation_on_campus': d[8],
+            'isolation_off_campus': d[9],
+            'beds_available': d[10],
+            'tests_administered': d[11],
             'last_updated': d[0]
         } for d in c.fetchall()]
         return data
@@ -196,8 +166,8 @@ def get_data():
         'alert_level': color,        
         'total_students': total_students + fall_data['total_students'],
         'total_staff': total_staff + fall_data['total_staff'],
-        #'new_students': new_students,
-        #'new_staff': new_staff,
+        'new_students': -1,
+        'new_staff': -1,
         'quarantine_on_campus': quarantine_on_campus,
         'quarantine_off_campus': quarantine_off_campus,
         'isolation_on_campus': isolation_on_campus,
