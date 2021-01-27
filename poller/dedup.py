@@ -3,14 +3,12 @@ import sqlite3
 def get_all_from_db():
     db_conn = sqlite3.connect('data/data.sqlite3')
     c = db_conn.cursor()
-    sql = 'SELECT alertlevel.time, alertlevel.color, total.total_students, total.total_staff, new.new_students, new.new_staff, ' + \
+    sql = 'SELECT alertlevel.time, alertlevel.color, total.total_students, total.total_staff, ' + \
         'quarantine.quarantine_on_campus, quarantine.quarantine_off_campus, isolation.isolation_on_campus, isolation.isolation_off_campus, ' + \
         'beds.beds_available, tests.tests_administered ' + \
         'FROM `alertlevel` ' + \
         'INNER JOIN `total` ' + \
         'ON alertlevel.time = total.time ' + \
-        'INNER JOIN `new` ' + \
-        'ON alertlevel.time = new.time ' + \
         'INNER JOIN `quarantine` ' + \
         'ON alertlevel.time = quarantine.time ' + \
         'INNER JOIN `isolation` ' + \
@@ -25,14 +23,12 @@ def get_all_from_db():
         'alert_level': d[1],        
         'total_students': d[2],
         'total_staff': d[3],
-        'new_students': d[4],
-        'new_staff': d[5],
-        'quarantine_on_campus': d[6],
-        'quarantine_off_campus': d[7],
-        'isolation_on_campus': d[8],
-        'isolation_off_campus': d[9],
-        'beds_available': d[10],
-        'tests_administered': d[11],
+        'quarantine_on_campus': d[4],
+        'quarantine_off_campus': d[5],
+        'isolation_on_campus': d[6],
+        'isolation_off_campus': d[7],
+        'beds_available': d[8],
+        'tests_administered': d[9],
         'last_updated': d[0]
     } for d in c.fetchall()]
     return data
@@ -44,8 +40,6 @@ def drop_by_date(date):
     sql = f'DELETE FROM `alertlevel` WHERE time=\'{date}\';'
     c.execute(sql)
     sql = f'DELETE FROM `total` WHERE time=\'{date}\';'
-    c.execute(sql)
-    sql = f'DELETE FROM `new` WHERE time=\'{date}\';'
     c.execute(sql)
     sql = f'DELETE FROM `quarantine` WHERE time=\'{date}\';'
     c.execute(sql)

@@ -5,6 +5,7 @@ import threading
 import sqlite3
 import atexit
 import datetime
+import json
 
 from flask import Flask, jsonify, request, make_response
 import requests
@@ -13,7 +14,7 @@ from bs4 import BeautifulSoup
 from .dedup import dedup
 
 POOL_TIME = 5 * 60 # Seconds
-DASHBOARD_URL = 'https://rit.edu/ready/dashboard'
+DASHBOARD_URL = 'https://rit.edu/ready/spring-dashboard'
 LATEST_DATA = None
 data_thread = threading.Thread()
 db_lock = threading.Lock()
@@ -54,8 +55,8 @@ def update_db():
         c.execute(sql)
         sql = f'INSERT INTO `total` VALUES (datetime(\'now\'), {LATEST_DATA["total_students"]}, {LATEST_DATA["total_staff"]});'
         c.execute(sql)
-        sql = f'INSERT INTO `new` VALUES (datetime(\'now\'), {LATEST_DATA["new_students"]}, {LATEST_DATA["new_staff"]});'
-        c.execute(sql)
+        #sql = f'INSERT INTO `new` VALUES (datetime(\'now\'), {LATEST_DATA["new_students"]}, {LATEST_DATA["new_staff"]});'
+        #c.execute(sql)
         sql = f'INSERT INTO `quarantine` VALUES (datetime(\'now\'), {LATEST_DATA["quarantine_on_campus"]}, {LATEST_DATA["quarantine_off_campus"]});'
         c.execute(sql)
         sql = f'INSERT INTO `isolation` VALUES (datetime(\'now\'), {LATEST_DATA["isolation_on_campus"]}, {LATEST_DATA["isolation_off_campus"]});'
@@ -72,14 +73,12 @@ def get_latest_from_db():
     with db_lock:
         db_conn = sqlite3.connect('data/data.sqlite3')
         c = db_conn.cursor()
-        sql = 'SELECT max(alertlevel.time), alertlevel.color, total.total_students, total.total_staff, new.new_students, new.new_staff, ' + \
+        sql = 'SELECT max(alertlevel.time), alertlevel.color, total.total_students, total.total_staff, ' + \
             'quarantine.quarantine_on_campus, quarantine.quarantine_off_campus, isolation.isolation_on_campus, isolation.isolation_off_campus, ' + \
             'beds.beds_available, tests.tests_administered ' + \
             'FROM `alertlevel` ' + \
             'INNER JOIN `total` ' + \
             'ON alertlevel.time = total.time ' + \
-            'INNER JOIN `new` ' + \
-            'ON alertlevel.time = new.time ' + \
             'INNER JOIN `quarantine` ' + \
             'ON alertlevel.time = quarantine.time ' + \
             'INNER JOIN `isolation` ' + \
@@ -95,14 +94,12 @@ def get_latest_from_db():
             'alert_level': d[1],        
             'total_students': d[2],
             'total_staff': d[3],
-            'new_students': d[4],
-            'new_staff': d[5],
-            'quarantine_on_campus': d[6],
-            'quarantine_off_campus': d[7],
-            'isolation_on_campus': d[8],
-            'isolation_off_campus': d[9],
-            'beds_available': d[10],
-            'tests_administered': d[11],
+            'quarantine_on_campus': d[4],
+            'quarantine_off_campus': d[5],
+            'isolation_on_campus': d[6],
+            'isolation_off_campus': d[7],
+            'beds_available': d[8],
+            'tests_administered': d[9],
             'last_updated': d[0]
         }
         return data
@@ -111,14 +108,12 @@ def get_all_from_db():
     with db_lock:
         db_conn = sqlite3.connect('data/data.sqlite3')
         c = db_conn.cursor()
-        sql = 'SELECT alertlevel.time, alertlevel.color, total.total_students, total.total_staff, new.new_students, new.new_staff, ' + \
+        sql = 'SELECT alertlevel.time, alertlevel.color, total.total_students, total.total_staff, ' + \
             'quarantine.quarantine_on_campus, quarantine.quarantine_off_campus, isolation.isolation_on_campus, isolation.isolation_off_campus, ' + \
             'beds.beds_available, tests.tests_administered ' + \
             'FROM `alertlevel` ' + \
             'INNER JOIN `total` ' + \
             'ON alertlevel.time = total.time ' + \
-            'INNER JOIN `new` ' + \
-            'ON alertlevel.time = new.time ' + \
             'INNER JOIN `quarantine` ' + \
             'ON alertlevel.time = quarantine.time ' + \
             'INNER JOIN `isolation` ' + \
@@ -133,14 +128,14 @@ def get_all_from_db():
             'alert_level': d[1],        
             'total_students': d[2],
             'total_staff': d[3],
-            'new_students': d[4],
-            'new_staff': d[5],
-            'quarantine_on_campus': d[6],
-            'quarantine_off_campus': d[7],
-            'isolation_on_campus': d[8],
-            'isolation_off_campus': d[9],
-            'beds_available': d[10],
-            'tests_administered': d[11],
+            #'new_students': d[4],
+            #'new_staff': d[5],
+            'quarantine_on_campus': d[4],
+            'quarantine_off_campus': d[5],
+            'isolation_on_campus': d[6],
+            'isolation_off_campus': d[7],
+            'beds_available': d[8],
+            'tests_administered': d[9],
             'last_updated': d[0]
         } for d in c.fetchall()]
         return data
@@ -170,16 +165,16 @@ def get_data():
     create_tables()
     page = requests.get(DASHBOARD_URL, headers={'Cache-Control': 'no-cache'})
     soup = BeautifulSoup(page.content, 'html.parser')
-    total_students = int(soup.find('div', attrs={'class': 'statistic-12481'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    total_staff = int(soup.find('div', attrs={'class': 'statistic-12484'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    new_students = int(soup.find('div', attrs={'class': 'statistic-12202'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    new_staff = int(soup.find('div', attrs={'class': 'statistic-12205'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    quarantine_on_campus = int(soup.find('div', attrs={'class': 'statistic-12190'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    quarantine_off_campus = int(soup.find('div', attrs={'class': 'statistic-12193'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    isolation_on_campus = int(soup.find('div', attrs={'class': 'statistic-12226'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    isolation_off_campus = int(soup.find('div', attrs={'class': 'statistic-12229'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    beds_available = int(soup.find('div', attrs={'class': 'statistic-12214'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip().strip('%'))
-    tests_administered = int(soup.find('div', attrs={'class': 'statistic-12829'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip().replace("*", " ").replace(",", ""))
+    total_students = int(soup.find('div', attrs={'class': 'statistic-13872'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    total_staff = int(soup.find('div', attrs={'class': 'statistic-13875'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    #new_students = int(soup.find('div', attrs={'class': 'statistic-12202'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    #new_staff = int(soup.find('div', attrs={'class': 'statistic-12205'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    quarantine_on_campus = int(soup.find('div', attrs={'class': 'statistic-13893'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    quarantine_off_campus = int(soup.find('div', attrs={'class': 'statistic-13896'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    isolation_on_campus = int(soup.find('div', attrs={'class': 'statistic-13905'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    isolation_off_campus = int(soup.find('div', attrs={'class': 'statistic-13908'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    beds_available = int(soup.find('div', attrs={'class': 'statistic-13935'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip().strip('%'))
+    tests_administered = int(soup.find('div', attrs={'class': 'statistic-13923'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip().replace("*", " ").replace(",", ""))
     container = soup.find('div', attrs={'id': 'pandemic-message-container'})
     alert_level = container.find("a").text
     color = ""
@@ -192,18 +187,23 @@ def get_data():
     elif "Red" in alert_level:
         color = 'red'
     global LATEST_DATA
+
+    fall_data = None
+    with open('history/fall-2020.json', 'r') as fd:
+        fall_data = json.loads(fd.read())
+
     current_data = {
         'alert_level': color,        
-        'total_students': total_students,
-        'total_staff': total_staff,
-        'new_students': new_students,
-        'new_staff': new_staff,
+        'total_students': total_students + fall_data['total_students'],
+        'total_staff': total_staff + fall_data['total_staff'],
+        #'new_students': new_students,
+        #'new_staff': new_staff,
         'quarantine_on_campus': quarantine_on_campus,
         'quarantine_off_campus': quarantine_off_campus,
         'isolation_on_campus': isolation_on_campus,
         'isolation_off_campus': isolation_off_campus,
         'beds_available': beds_available,
-        'tests_administered': tests_administered,
+        'tests_administered': tests_administered + fall_data['tests_administered'],
         'last_updated': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     LATEST_DATA = current_data
@@ -215,7 +215,6 @@ def get_data():
 get_data()
 # When you kill Flask (SIGTERM), clear the trigger for the next thread
 atexit.register(interrupt)
-
 
 APP = Flask(__name__)
 
