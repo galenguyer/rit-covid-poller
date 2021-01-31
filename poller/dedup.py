@@ -69,5 +69,3 @@ def dedup():
         else:
             drop_by_date(data[i]['last_updated'])
             print('dropped ' + data[i]['last_updated'])
-
-dedup()

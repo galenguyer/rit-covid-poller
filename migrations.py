@@ -1,29 +1,10 @@
 import os
-import csv
+import json
 import sqlite3
 
-LATEST_DATA={}
+from poller.db import create_tables, get_latest_from_db
 
-def create_tables():
-    print('creating tables')
-    db_conn = sqlite3.connect('./data/data.sqlite3')
-    c = db_conn.cursor()
-    sql = f'CREATE TABLE IF NOT EXISTS `alertlevel` (time DATETIME PRIMARY KEY NOT NULL, color CHAR(50) NOT NULL);'
-    c.execute(sql)
-    sql = f'CREATE TABLE IF NOT EXISTS `total` (time DATETIME PRIMARY KEY NOT NULL, total_students INT NOT NULL, total_staff INT NOT NULL);'
-    c.execute(sql)
-    sql = f'CREATE TABLE IF NOT EXISTS `new` (time DATETIME PRIMARY KEY NOT NULL, new_students INT NOT NULL, new_staff INT NOT NULL);'
-    c.execute(sql)
-    sql = f'CREATE TABLE IF NOT EXISTS `quarantine` (time DATETIME PRIMARY KEY NOT NULL, quarantine_on_campus INT NOT NULL, quarantine_off_campus INT NOT NULL);'
-    c.execute(sql)
-    sql = f'CREATE TABLE IF NOT EXISTS `isolation` (time DATETIME PRIMARY KEY NOT NULL, isolation_on_campus INT NOT NULL, isolation_off_campus INT NOT NULL);'
-    c.execute(sql)
-    sql = f'CREATE TABLE IF NOT EXISTS `beds` (time DATETIME PRIMARY KEY NOT NULL, beds_available INT NOT NULL);'
-    c.execute(sql)
-    sql = f'CREATE TABLE IF NOT EXISTS `tests` (time DATETIME PRIMARY KEY NOT NULL, tests_administered INT NOT NULL);'
-    c.execute(sql)
-    db_conn.commit()
-    db_conn.close()
+LATEST_DATA={}
 
 def update_db():
     db_conn = sqlite3.connect('./data/data.sqlite3')
@@ -45,44 +26,6 @@ def update_db():
     db_conn.commit()
     db_conn.close()
 
-def get_latest_from_db():
-
-    db_conn = sqlite3.connect('./data/data.sqlite3')
-    c = db_conn.cursor()
-    sql = 'SELECT max(alertlevel.time), alertlevel.color, total.total_students, total.total_staff, new.new_students, new.new_staff, ' + \
-        'quarantine.quarantine_on_campus, quarantine.quarantine_off_campus, isolation.isolation_on_campus, isolation.isolation_off_campus, ' + \
-        'beds.beds_available, tests.tests_administered ' + \
-        'FROM `alertlevel` ' + \
-        'INNER JOIN `total` ' + \
-        'ON alertlevel.time = total.time ' + \
-        'INNER JOIN `new` ' + \
-        'ON alertlevel.time = new.time ' + \
-        'INNER JOIN `quarantine` ' + \
-        'ON alertlevel.time = quarantine.time ' + \
-        'INNER JOIN `isolation` ' + \
-        'ON alertlevel.time = isolation.time ' + \
-        'INNER JOIN `beds` ' + \
-        'ON alertlevel.time = beds.time ' + \
-        'INNER JOIN `tests` ' + \
-        'ON alertlevel.time = tests.time'
-    c.execute(sql)
-    d = c.fetchone()
-    data = {
-        'alert_level': d[1],        
-        'total_students': d[2],
-        'total_staff': d[3],
-        'new_students': d[4],
-        'new_staff': d[5],
-        'quarantine_on_campus': d[6],
-        'quarantine_off_campus': d[7],
-        'isolation_on_campus': d[8],
-        'isolation_off_campus': d[9],
-        'beds_available': d[10],
-        'tests_administered': d[11],
-        'last_updated': d[0]
-    }
-    return data
-
 def db_is_same():
     global LATEST_DATA
     latest_data = get_latest_from_db()
@@ -98,29 +41,25 @@ if not os.path.exists('./data'):
 
 create_tables()
 
-with open('historical_data.csv', 'r') as csvfile:
+with open('history/history.json', 'r') as fd:
     print('importing data...')
-    csvreader = csv.reader(csvfile)
-    firstRow = True
-    for row in csvreader:
-        if firstRow: 
-            firstRow = False
-            continue
+    data = json.loads(fd.read())
+    for day in data:
+        print(day)
         LATEST_DATA = {
-            'alert_level': str(row[1]),        
-            'total_students': int(row[4]),
-            'total_staff': int(row[5]),
-            'new_students': int(row[2]),
-            'new_staff': int(row[3]),
-            'quarantine_on_campus': int(row[6]),
-            'quarantine_off_campus': int(row[7]),
-            'isolation_on_campus': int(row[8]),
-            'isolation_off_campus': int(row[9]),
-            'beds_available': int(row[11]),
-            'tests_administered': int(row[10]),
-            'last_updated': f'{row[0]} 16:00:00'
+            'alert_level': str(day['alert_level']),        
+            'total_students': int(day['total_students']),
+            'total_staff': int(day['total_staff']),
+            'new_students': int(day['new_students']),
+            'new_staff': int(day['new_staff']),
+            'quarantine_on_campus': int(day['quarantine_on_campus']),
+            'quarantine_off_campus': int(day['quarantine_off_campus']),
+            'isolation_on_campus': int(day['isolation_on_campus']),
+            'isolation_off_campus': int(day['isolation_off_campus']),
+            'beds_available': int(day['beds_available']),
+            'tests_administered': int(day['tests_administered']),
+            'last_updated': day['last_updated']
         }
-        if not db_is_same():
-            update_db()
+        update_db()
     print('data imported!')
         
