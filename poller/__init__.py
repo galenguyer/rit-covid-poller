@@ -24,6 +24,7 @@ if not os.path.exists('./data'):
     os.mkdir('./data')
 
 def update_db():
+    print('updating db')
     with db_lock:
         db_conn = sqlite3.connect('data/data.sqlite3')
         c = db_conn.cursor()
@@ -64,6 +65,7 @@ def db_is_same(current_data):
     return True
 
 def get_data():
+    print('fetching data')
     global data_thread
     data_thread = threading.Timer(POOL_TIME, get_data, ())
     data_thread.start()
@@ -96,13 +98,13 @@ def get_data():
     fall_data = None
     with open('history/fall-2020.json', 'r') as fd:
         fall_data = json.loads(fd.read())
-
+    two_weeks_ago = get_all_from_db()[-11]
     current_data = {
         'alert_level': color,        
         'total_students': total_students + fall_data['total_students'],
         'total_staff': total_staff + fall_data['total_staff'],
-        'new_students': -1,
-        'new_staff': -1,
+        'new_students': total_students + fall_data['total_students'] - two_weeks_ago['total_students'],
+        'new_staff': total_staff + fall_data['total_staff'] - two_weeks_ago['total_staff'],
         'quarantine_on_campus': quarantine_on_campus,
         'quarantine_off_campus': quarantine_off_campus,
         'isolation_on_campus': isolation_on_campus,
@@ -115,6 +117,8 @@ def get_data():
     if not db_is_same(current_data):
         update_db()
     return current_data
+
+get_data()
 
 APP = Flask(__name__)
 
