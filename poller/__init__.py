@@ -74,8 +74,8 @@ def get_data():
     soup = BeautifulSoup(page.content, 'html.parser')
     total_students = int(soup.find('div', attrs={'class': 'statistic-13872'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
     total_staff = int(soup.find('div', attrs={'class': 'statistic-13875'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    #new_students = int(soup.find('div', attrs={'class': 'statistic-12202'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    #new_staff = int(soup.find('div', attrs={'class': 'statistic-12205'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    new_students = int(soup.find('div', attrs={'class': 'statistic-14335'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    new_staff = int(soup.find('div', attrs={'class': 'statistic-14332'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
     quarantine_on_campus = int(soup.find('div', attrs={'class': 'statistic-13893'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
     quarantine_off_campus = int(soup.find('div', attrs={'class': 'statistic-13896'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
     isolation_on_campus = int(soup.find('div', attrs={'class': 'statistic-13905'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
@@ -98,13 +98,12 @@ def get_data():
     fall_data = None
     with open('history/fall-2020.json', 'r') as fd:
         fall_data = json.loads(fd.read())
-    two_weeks_ago = get_all_from_db()[-11]
     current_data = {
         'alert_level': color,        
         'total_students': total_students + fall_data['total_students'],
         'total_staff': total_staff + fall_data['total_staff'],
-        'new_students': total_students + fall_data['total_students'] - two_weeks_ago['total_students'],
-        'new_staff': total_staff + fall_data['total_staff'] - two_weeks_ago['total_staff'],
+        'new_students': new_students,
+        'new_staff': new_staff,
         'quarantine_on_campus': quarantine_on_campus,
         'quarantine_off_campus': quarantine_off_campus,
         'isolation_on_campus': isolation_on_campus,
