@@ -32,3 +32,22 @@ class Day(db.Model):
         Helper to get all values from the database
         """
         return cls.query.all()
+
+    def serialize(self):
+        """
+        used for json serialization
+        """
+        return {
+            'last_updated': self.last_updated,
+            'alert_level': self.alert_level,
+            'beds_available': self.beds_available,
+            'isolation_off_campus': self.isolation_off_campus,
+            'isolation_on_campus': self.isolation_on_campus,
+            'new_staff': self.new_staff,
+            'new_students': self.new_students,
+            'quarantine_off_campus': self.quarantine_off_campus,
+            'quarantine_on_campus': self.quarantine_on_campus,
+            'tests_administered': self.tests_administered,
+            'total_staff': self.total_staff,
+            'total_students': self.total_students,
+        }
