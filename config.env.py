@@ -9,9 +9,10 @@ import secrets
 # Flask config
 DEBUG = False
 IP = environ.get('POLLER_IP', 'localhost')
-PORT = environ.get('POLLER_PORT', '8000')
-PROTOCOL = environ.get('POLLER_PROTOCOL', 'http://')
+PORT = environ.get('POLLER_PORT', '5000')
 SECRET_KEY = environ.get('POLLER_SECRET_KEY', default=''.join(secrets.token_hex(16)))
+LOG_LEVEL = environ.get('PACKET_LOG_LEVEL', 'INFO')
+VERSION = '0.1.0'
 
 # SQLAlchemy config
 SQLALCHEMY_DATABASE_URI = environ.get('POLLER_DATABASE_URI', 'sqlite:////tmp/rit-covid-poller.db')
