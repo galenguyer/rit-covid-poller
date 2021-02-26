@@ -26,3 +26,6 @@ APP.logger.info('Launching rit-covid-poller v' + APP.config['VERSION'])
 db = SQLAlchemy(APP)
 APP.logger.info('SQLAlchemy pointed at ' + repr(db.engine.url))
 #pylint: enable=no-member
+
+#pylint: disable=wrong-import-position
+from . import models
