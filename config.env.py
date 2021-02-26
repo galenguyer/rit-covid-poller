@@ -12,6 +12,4 @@ import os
 # Defaults for flask configuration
 IP = os.environ.get('IP', '127.0.0.1')
 PORT = os.environ.get('PORT', 5000)
-#SERVER_NAME = os.environ.get('SERVER_NAME', 'localhost:5000')
 SECRET_KEY = os.environ.get('SESSION_KEY', default=''.join(secrets.token_hex(16)))
-
