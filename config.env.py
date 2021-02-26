@@ -15,5 +15,5 @@ LOG_LEVEL = environ.get('PACKET_LOG_LEVEL', 'INFO')
 VERSION = '0.1.0'
 
 # SQLAlchemy config
-SQLALCHEMY_DATABASE_URI = environ.get('POLLER_DATABASE_URI', 'sqlite:////tmp/rit-covid-poller.db')
+SQLALCHEMY_DATABASE_URI = environ.get('POLLER_DATABASE_URI', f'sqlite:///data.db')
 SQLALCHEMY_TRACK_MODIFICATIONS = False

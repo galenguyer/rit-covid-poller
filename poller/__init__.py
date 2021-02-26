@@ -29,3 +29,6 @@ APP.logger.info('SQLAlchemy pointed at ' + repr(db.engine.url))
 
 #pylint: disable=wrong-import-position
 from . import models
+from . import commands
+
+db.create_all()
