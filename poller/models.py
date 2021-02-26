@@ -38,7 +38,7 @@ class Day(db.Model):
         used for json serialization
         """
         return {
-            'last_updated': self.last_updated,
+            'last_updated': self.last_updated.strftime('%Y-%m-%d %H:%M:%S'),
             'alert_level': self.alert_level,
             'beds_available': self.beds_available,
             'isolation_off_campus': self.isolation_off_campus,
