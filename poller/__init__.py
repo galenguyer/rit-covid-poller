@@ -14,7 +14,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 POOL_TIME = 5 * 60 # Seconds
-DASHBOARD_URL = 'https://rit.edu/ready/spring-dashboard'
+DASHBOARD_URL = 'https://rit.edu/ready/summer-dashboard'
 DATA_THREAD = threading.Thread()
 
 APP = Flask(__name__)
@@ -67,16 +67,16 @@ def get_data():
     DATA_THREAD.start()
     page = requests.get(DASHBOARD_URL, headers={'Cache-Control': 'no-cache'})
     soup = BeautifulSoup(page.content, 'html.parser')
-    total_students = int(soup.find('div', attrs={'class': 'statistic-13872'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    total_staff = int(soup.find('div', attrs={'class': 'statistic-13875'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    new_students = int(soup.find('div', attrs={'class': 'statistic-14332'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    new_staff = int(soup.find('div', attrs={'class': 'statistic-14335'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    quarantine_on_campus = int(soup.find('div', attrs={'class': 'statistic-13893'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    quarantine_off_campus = int(soup.find('div', attrs={'class': 'statistic-13896'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    isolation_on_campus = int(soup.find('div', attrs={'class': 'statistic-13905'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    isolation_off_campus = int(soup.find('div', attrs={'class': 'statistic-13908'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    beds_available = int(soup.find('div', attrs={'class': 'statistic-13935'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip().strip('%'))
-    tests_administered = int(soup.find('div', attrs={'class': 'statistic-13923'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip().replace("*", " ").replace(",", ""))
+    #total_students = int(soup.find('div', attrs={'class': 'statistic-13872'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    #total_staff = int(soup.find('div', attrs={'class': 'statistic-13875'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    new_students = int(soup.find('div', attrs={'class': 'statistic-14884'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    new_staff = int(soup.find('div', attrs={'class': 'statistic-14887'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    #quarantine_on_campus = int(soup.find('div', attrs={'class': 'statistic-13893'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    #quarantine_off_campus = int(soup.find('div', attrs={'class': 'statistic-13896'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    #isolation_on_campus = int(soup.find('div', attrs={'class': 'statistic-13905'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    #isolation_off_campus = int(soup.find('div', attrs={'class': 'statistic-13908'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    #beds_available = int(soup.find('div', attrs={'class': 'statistic-13935'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip().strip('%'))
+    #tests_administered = int(soup.find('div', attrs={'class': 'statistic-13923'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip().replace("*", " ").replace(",", ""))
     container = soup.find('div', attrs={'id': 'pandemic-message-container'})
     alert_level = container.find('a').text
     color = ""
@@ -89,22 +89,22 @@ def get_data():
     elif "Red" in alert_level:
         color = 'red'
 
-    fall_data = None
-    with open('history/fall-2020.json', 'r') as fd:
-        fall_data = json.loads(fd.read())
+    #fall_data = None
+    #with open('history/fall-2020.json', 'r') as fd:
+    #    fall_data = json.loads(fd.read())
     current_data = Day(
         last_updated=datetime.datetime.now(),
         alert_level=color,
-        beds_available=beds_available,
-        isolation_off_campus=isolation_off_campus,
-        isolation_on_campus=isolation_on_campus,
+        beds_available=-1,
+        isolation_off_campus=-1,
+        isolation_on_campus=-1,
         new_staff=new_staff,
         new_students=new_students,
-        quarantine_off_campus=quarantine_off_campus,
-        quarantine_on_campus=quarantine_on_campus,
-        tests_administered=tests_administered + fall_data['tests_administered'],
-        total_staff=total_staff + fall_data['total_staff'],
-        total_students=total_students + fall_data['total_students'])
+        quarantine_off_campus=-1,
+        quarantine_on_campus=-1,
+        tests_administered=-1,
+        total_staff=-1,
+        total_students=-1)
     print(current_data.serialize())
     if not data_are_same(Day.get_all()[-1], current_data):
         db.session.add(current_data)
