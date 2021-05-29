@@ -1,0 +1,14 @@
+{
+  "alert_level": "green",
+  "beds_available": 100,
+  "isolation_off_campus": 0,
+  "isolation_on_campus": 0,
+  "last_updated": "2021-05-24 15:49:45",
+  "new_staff": 0,
+  "new_students": 1,
+  "quarantine_off_campus": 0,
+  "quarantine_on_campus": 0,
+  "tests_administered": 154043,
+  "total_staff": 192,
+  "total_students": 379
+}
