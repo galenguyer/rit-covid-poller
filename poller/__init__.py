@@ -77,17 +77,17 @@ def get_data():
     #isolation_off_campus = int(soup.find('div', attrs={'class': 'statistic-13908'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
     #beds_available = int(soup.find('div', attrs={'class': 'statistic-13935'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip().strip('%'))
     #tests_administered = int(soup.find('div', attrs={'class': 'statistic-13923'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip().replace("*", " ").replace(",", ""))
-    container = soup.find('div', attrs={'id': 'pandemic-message-container'})
-    alert_level = container.find('a').text
+    #container = soup.find('div', attrs={'id': 'pandemic-message-container'})
+    #alert_level = container.find('a').text
     color = ""
-    if "Green" in alert_level:
-        color = 'green'
-    elif "Yellow" in alert_level:
-        color = 'yellow'
-    elif "Orange" in alert_level:
-        color = 'orange'
-    elif "Red" in alert_level:
-        color = 'red'
+    #if "Green" in alert_level:
+    #    color = 'green'
+    #elif "Yellow" in alert_level:
+    #    color = 'yellow'
+    #elif "Orange" in alert_level:
+    #    color = 'orange'
+    #elif "Red" in alert_level:
+    #    color = 'red'
 
     #fall_data = None
     #with open('history/fall-2020.json', 'r') as fd:
