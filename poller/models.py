@@ -33,6 +33,13 @@ class Day(db.Model):
         """
         return cls.query.all()
 
+    @classmethod
+    def get_after(cls, after):
+        """
+        Helper to get all values after a given date
+        """
+        return cls.query.filter(cls.last_updated > after).all()
+
     def serialize(self):
         """
         used for json serialization
