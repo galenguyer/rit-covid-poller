@@ -11,6 +11,7 @@ import threading
 from flask import Flask
 from bs4 import BeautifulSoup
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 
 POOL_TIME = 5 * 60 # Seconds
@@ -34,6 +35,7 @@ logging.getLogger().setLevel(APP.config['LOG_LEVEL'])
 APP.logger.info('Launching rit-covid-poller v' + APP.config['VERSION'])
 
 db = SQLAlchemy(APP)
+migrate = Migrate(APP, db)
 APP.logger.info('SQLAlchemy pointed at ' + repr(db.engine.url))
 #pylint: enable=no-member
 
@@ -123,4 +125,4 @@ def dedup():
             print('dropped ' + data[i].serialize()['last_updated'])
     db.session.commit()
 
-get_data()
+#get_data()
