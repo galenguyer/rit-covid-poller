@@ -108,8 +108,11 @@ def get_data():
         total_staff=-1,
         total_students=-1)
     print(current_data.serialize())
-    if not data_are_same(Day.get_all()[-1], current_data):
-        db.session.add(current_data)
+    try:
+        if not data_are_same(Day.get_all()[-1], current_data):
+            db.session.add(current_data)
+    except IndexError:
+            db.session.add(current_data)
     dedup()
     return current_data
 
@@ -125,4 +128,4 @@ def dedup():
             print('dropped ' + data[i].serialize()['last_updated'])
     db.session.commit()
 
-#get_data()
+get_data()
