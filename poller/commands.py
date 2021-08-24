@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 from . import APP, db
 from .models import Day
-DASHBOARD_URL = 'https://rit.edu/ready/summer-dashboard'
+DASHBOARD_URL = 'https://www.rit.edu/ready/fall-2021-dashboard'
 
 
 @APP.cli.command('import-history')
@@ -66,10 +66,10 @@ def get_data():
     print('fetching data')
     page = requests.get(DASHBOARD_URL, headers={'Cache-Control': 'no-cache'})
     soup = BeautifulSoup(page.content, 'html.parser')
-    #total_students = int(soup.find('div', attrs={'class': 'statistic-13872'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    #total_staff = int(soup.find('div', attrs={'class': 'statistic-13875'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    new_students = int(soup.find('div', attrs={'class': 'statistic-14884'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    new_staff = int(soup.find('div', attrs={'class': 'statistic-14887'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    total_students = int(soup.find('div', attrs={'class': 'statistic-16128'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    total_staff = int(soup.find('div', attrs={'class': 'statistic-16119'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    new_students = int(soup.find('div', attrs={'class': 'statistic-16116'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    new_staff = int(soup.find('div', attrs={'class': 'statistic-16131'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
     #quarantine_on_campus = int(soup.find('div', attrs={'class': 'statistic-13893'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
     #quarantine_off_campus = int(soup.find('div', attrs={'class': 'statistic-13896'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
     #isolation_on_campus = int(soup.find('div', attrs={'class': 'statistic-13905'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
@@ -102,8 +102,8 @@ def get_data():
         quarantine_off_campus=-1,
         quarantine_on_campus=-1,
         tests_administered=-1,
-        total_staff=-1,
-        total_students=-1)
+        total_staff=total_staff,
+        total_students=total_students)
     print(current_data.serialize())
     try:
         if not data_are_same(Day.get_all()[-1], current_data):
