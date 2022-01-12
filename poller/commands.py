@@ -38,7 +38,8 @@ def import_history(history_file):
                 quarantine_on_campus=item['quarantine_on_campus'],
                 tests_administered=item['tests_administered'],
                 total_staff=item['total_staff'],
-                total_students=item['total_students']))
+                total_students=item['total_students'],
+                hospitalizations=item['hospitalizations'])
     db.session.commit()
 
 
@@ -66,10 +67,11 @@ def get_data():
     print('fetching data')
     page = requests.get(DASHBOARD_URL, headers={'Cache-Control': 'no-cache'})
     soup = BeautifulSoup(page.content, 'html.parser')
-    total_students = int(soup.find('div', attrs={'class': 'statistic-16128'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    total_staff = int(soup.find('div', attrs={'class': 'statistic-16131'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    new_students = int(soup.find('div', attrs={'class': 'statistic-16116'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
-    new_staff = int(soup.find('div', attrs={'class': 'statistic-16119'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    total_students = int(soup.find('div', attrs={'class': 'statistic-16723'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    total_staff = int(soup.find('div', attrs={'class': 'statistic-16726'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    new_students = int(soup.find('div', attrs={'class': 'statistic-16711'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    new_staff = int(soup.find('div', attrs={'class': 'statistic-16714'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
+    hospitalizations = int(soup.find('div', attrs={'class': 'statistic-16758'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
     #quarantine_on_campus = int(soup.find('div', attrs={'class': 'statistic-13893'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
     #quarantine_off_campus = int(soup.find('div', attrs={'class': 'statistic-13896'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
     #isolation_on_campus = int(soup.find('div', attrs={'class': 'statistic-13905'}).find_all("p", attrs={'class': 'card-header'})[0].text.strip())
@@ -103,7 +105,9 @@ def get_data():
         quarantine_on_campus=-1,
         tests_administered=-1,
         total_staff=total_staff,
-        total_students=total_students)
+        total_students=total_students,
+        hospitalizations=hospitalizations
+        )
     print(current_data.serialize())
     try:
         if not data_are_same(Day.get_all()[-1], current_data):

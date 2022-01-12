@@ -25,6 +25,7 @@ class Day(db.Model):
     tests_administered = Column(Integer, nullable=False)
     total_staff = Column(Integer, nullable=False)
     total_students = Column(Integer, nullable=False)
+    hospitalizations = Column(Integer, nullable=False)
 
     @classmethod
     def get_all(cls):
