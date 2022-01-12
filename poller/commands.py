@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 from . import APP, db
 from .models import Day
-DASHBOARD_URL = 'https://www.rit.edu/ready/fall-2021-dashboard'
+DASHBOARD_URL = 'https://www.rit.edu/ready/spring-2022-dashboard'
 
 
 @APP.cli.command('import-history')
